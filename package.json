@@ -1,0 +1,26 @@
+{
+  "name": "cordova-air-update-cli",
+  "version": "0.0.1",
+  "description": "CLI For Air update of Cordova Apps",
+  "author": "Raman Rasliuk <roma@redbox.by>",
+  "bin": {
+    "cau": "./bin/cli"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf ./dist/*",
+    "lint": "tslint --config tslint.js --project tsconfig.json --type-check",
+    "build": "npm run clean && tsc"
+  },
+  "files": [
+    "bin/",
+    "dist/"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^8.0.22",
+    "tslint": "^5.6.0",
+    "typescript": "^2.4.2"
+  }
+}
