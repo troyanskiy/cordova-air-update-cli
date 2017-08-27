@@ -1,10 +1,14 @@
+import * as chalk from 'chalk';
+
 import { IConfig } from './declarations';
+import { HttpRequest } from './lib/request';
+import { getPackage } from './utils';
+// import { prettyJSON } from './utils';
 
 
 function getConfig(): IConfig {
 
   const rootPath = process.cwd();
-  const homePath = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 
   const argv: string[] = process.argv.slice(2);
 
@@ -12,18 +16,19 @@ function getConfig(): IConfig {
   try {
     configApp = require(`${rootPath}/cau.config.json`);
   } catch (err) {
-    configApp = {};
+    configApp = null;
   }
 
 
-  let configUser: any;
+  let appPackage: any;
   try {
-    configUser = require(`${homePath}/.cau/config.json`);
+    appPackage = getPackage();
   } catch (err) {
-    configUser = {};
+    console.log(chalk.red('package.json is not found'));
+    process.exit(1);
   }
 
-  return {...configUser, ...configApp, rootPath, argv};
+  return {appConfig: configApp, rootPath, argv, appPackage};
 
 }
 
@@ -34,11 +39,20 @@ export function run() {
 
   if (config.argv.length) {
 
-    const commands = ['login', 'logout', 'register', 'init', 'create', 'deploy', 'revoke', 'help'];
+    const commands = ['init', 'login', 'logout', 'app', 'platform', 'channel', 'deploy', 'revoke', 'register', 'help'];
     const command = config.argv[0];
 
     if (commands.indexOf(command) > -1) {
-      require(`./commands/${command}`).run(config);
+      config.argv = config.argv.slice(1);
+      // console.log(prettyJSON(config));
+
+      HttpRequest.init(config);
+
+      try {
+        require(`./commands/${command}`).run(config);
+      } catch (err) {
+        // noop
+      }
 
       return;
     }

@@ -5,6 +5,6 @@
 const bootstrap = require('cordova-air-update-cli/dist/index');
 
 process.title = 'angular-air-update';
-process.on('unhandledRejection', function(r) { console.error(r); });
+process.on('unhandledRejection', function(r) { });
 
 bootstrap.run();

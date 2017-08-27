@@ -1,17 +1,37 @@
 {
   "name": "cordova-air-update-cli",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "CLI For Air update of Cordova Apps",
   "author": "Raman Rasliuk <roma@redbox.by>",
   "bin": {
-    "cau": "./bin/cli"
+    "cau": "./bin/cli",
+    "cordova-air-update": "./bin/cli"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist/*",
     "lint": "tslint --config tslint.js --project tsconfig.json --type-check",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "cordova",
+    "device",
+    "ecosystem:cordova",
+    "cordova-ios",
+    "deploy",
+    "update",
+    "airupdate",
+    "publish",
+    "airUpdate CLI"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/troyanskiy/cordova-air-update-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/troyanskiy/cordova-air-update-cli/issues"
   },
   "files": [
     "bin/",
@@ -19,8 +39,22 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^8.0.22",
+    "@types/archiver": "^2.0.0",
+    "@types/chalk": "^0.4.31",
+    "@types/jsonwebtoken": "^7.2.3",
+    "@types/node": "^8.0.24",
+    "@types/request": "^2.0.1",
+    "@types/semver": "^5.3.34",
     "tslint": "^5.6.0",
     "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "archiver": "^2.0.0",
+    "chalk": "^2.1.0",
+    "elementtree": "^0.1.7",
+    "jsonwebtoken": "^7.4.3",
+    "md5-file": "^3.2.2",
+    "request": "^2.81.0",
+    "semver": "^5.4.1"
   }
 }
