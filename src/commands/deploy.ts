@@ -10,6 +10,8 @@ import { HttpRequest } from '../lib/request';
 
 export async function run(config: IConfig) {
 
+
+
   const configStatus = await checkConfig(config);
 
   if (configStatus !== ConfigStatus.OK) {
@@ -31,6 +33,20 @@ export async function run(config: IConfig) {
   };
 
   const channelId = platformChannel.id;
+
+  const extras = config.argv
+    .filter((str: string) => str.startsWith('--extra.'))
+    .reduce((extra: any, currentValue: string) => {
+
+      currentValue = currentValue.substr(8);
+
+      const [key, value] = currentValue.split('=', 2);
+      const keys = key.split('.');
+
+      setExtra(extra, keys, value);
+
+      return extra;
+    }, {});
 
   try {
     const resp = await HttpRequest.request(`/deploy/${channelId}/meta/latest`);
@@ -67,7 +83,7 @@ export async function run(config: IConfig) {
   const localFilesMap = await createFileMap(wwwDir);
 
 
-  const signedData = JSON.stringify({filesMap: localFilesMap, version: config.appPackage.version});
+  const signedData = JSON.stringify({filesMap: localFilesMap, version: config.appPackage.version, extras});
   console.log('Files signature has been created');
 
 
@@ -120,5 +136,50 @@ export async function run(config: IConfig) {
   if (sendZip) {
     fs.unlinkSync(zipFileName);
   }
+
+}
+
+
+function setExtra(extra: any, keys: string[], value: any) {
+
+  const field = keys.shift();
+
+  if (field) {
+
+    if (keys.length) {
+
+      if (extra[field] === undefined) {
+        extra[field] = {};
+      }
+
+      setExtra(extra[field], keys, value);
+
+    } else {
+
+      extra[field] = convertExtraValue(value);
+
+    }
+
+  }
+
+}
+
+function convertExtraValue(value: string) {
+
+  // number test
+  const num = parseFloat(value);
+  if (!isNaN(num) && num.toString() === value) {
+    return num;
+  }
+
+  if (value.toLowerCase() === 'true') {
+    return true;
+  }
+
+  if (value.toLowerCase() === 'false') {
+    return false;
+  }
+
+  return value;
 
 }
