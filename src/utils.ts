@@ -3,6 +3,7 @@ import * as chalk from 'chalk';
 import * as readline from 'readline';
 import * as path from 'path';
 import * as archiver from 'archiver';
+import * as crypto from 'crypto';
 import {
   CommandCrud,
   ConfigStatus,
@@ -20,7 +21,6 @@ import { RequestResponse } from 'request';
 
 const ET = require('elementtree');
 
-const md5File = require('md5-file');
 
 /**
  * Write to file
@@ -635,7 +635,7 @@ export async function createFileMap(dir: string): Promise<IFilesMap> {
   for (let i = 0; i < filesList.length; i++) {
 
     const file = path.join(dir, filesList[i]);
-    const hash = await md5FilePromise(file);
+    const hash = await getFileCheckSum(file);
 
     filesMap[filesList[i]] = hash;
 
@@ -651,16 +651,27 @@ export async function createFileMap(dir: string): Promise<IFilesMap> {
  * @param {string} file
  * @return {Promise<string>}
  */
-export function md5FilePromise(file: string): Promise<string> {
+export function getFileCheckSum(file: string): Promise<string> {
 
   return new Promise((resolve, reject) => {
-    md5File(file, (err: any, hash: string) => {
-      if (err) {
-        reject(err);
+
+    const hash = crypto.createHash('sha256');
+
+    const input = fs.createReadStream(file);
+
+    input.on('readable', () => {
+      const data = input.read();
+      if (data) {
+        hash.update(data);
       } else {
-        resolve(hash);
+        resolve(hash.digest('hex'));
       }
     });
+
+    input.on('error', (error: Error) => {
+      reject(error);
+    });
+
   });
 
 }
@@ -731,7 +742,7 @@ export function getPackage(): IPackageJson {
 
   const name = nameEl.text;
 
-  return { version, name };
+  return {version, name};
 
 }
 
